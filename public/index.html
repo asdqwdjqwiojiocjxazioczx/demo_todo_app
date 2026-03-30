@@ -12,7 +12,6 @@
     input, button { padding: 10px 12px; border-radius: 8px; border: 1px solid #ccc; }
     input { width: 100%; box-sizing: border-box; }
     button { cursor: pointer; background: #2563eb; color: white; border: none; }
-    button.secondary { background: #4b5563; }
     .row { display: flex; gap: 8px; }
     .row > * { flex: 1; }
     ul { padding-left: 18px; }
@@ -48,40 +47,6 @@
       return data;
     }
 
-    async function loadTodos() {
-      const container = document.getElementById('todoList');
-      container.innerHTML = '<div class="card">Loading...</div>';
-      try {
-        const { items } = await fetchJson('/api/todos');
-        if (!items.length) {
-          container.innerHTML = '<div class="card">No todos yet.</div>';
-          return;
-        }
-        container.innerHTML = '';
-        for (const todo of items) {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <div class="todo-title">${todo.title}</div>
-            <div class="muted">Todo #${todo.id}</div>
-            <div class="comment-box">
-              <h3>Comments</h3>
-              <ul id="comments-${todo.id}"><li>Loading comments...</li></ul>
-              <div class="row">
-                <input id="comment-input-${todo.id}" placeholder="Add a comment" />
-                <button onclick="createComment(${todo.id})">Add Comment</button>
-              </div>
-              <div id="comment-message-${todo.id}"></div>
-            </div>
-          `;
-          container.appendChild(card);
-          loadComments(todo.id);
-        }
-      } catch (err) {
-        container.innerHTML = `<div class="card error">${err.message}</div>`;
-      }
-    }
-
     async function loadComments(todoId) {
       const list = document.getElementById(`comments-${todoId}`);
       try {
@@ -93,6 +58,44 @@
         list.innerHTML = items.map(c => `<li>${c.content}</li>`).join('');
       } catch (err) {
         list.innerHTML = `<li class="error">${err.message}</li>`;
+      }
+    }
+
+    async function loadTodos() {
+      const container = document.getElementById('todoList');
+      container.innerHTML = '<div class="card">Loading...</div>';
+      try {
+        const { items } = await fetchJson('/api/todos');
+        if (!items.length) {
+          container.innerHTML = '<div class="card">No todos yet.</div>';
+          return;
+        }
+
+        container.innerHTML = items.map(todo => `
+          <div class="card">
+            <div class="todo-title">${todo.title}</div>
+            <div class="muted">Todo #${todo.id}</div>
+            <div class="comment-box">
+              <h3>Comments</h3>
+              <ul id="comments-${todo.id}"><li>Loading comments...</li></ul>
+              <div class="row">
+                <input id="comment-input-${todo.id}" placeholder="Add a comment" />
+                <button data-todo-id="${todo.id}" class="add-comment-btn">Add Comment</button>
+              </div>
+              <div id="comment-message-${todo.id}"></div>
+            </div>
+          </div>
+        `).join('');
+
+        document.querySelectorAll('.add-comment-btn').forEach((button) => {
+          button.addEventListener('click', () => createComment(Number(button.dataset.todoId)));
+        });
+
+        for (const todo of items) {
+          await loadComments(todo.id);
+        }
+      } catch (err) {
+        container.innerHTML = `<div class="card error">${err.message}</div>`;
       }
     }
 
@@ -110,7 +113,7 @@
         input.value = '';
         msg.className = 'success';
         msg.textContent = 'Todo created successfully';
-        loadTodos();
+        await loadTodos();
       } catch (err) {
         msg.className = 'error';
         msg.textContent = err.message;
@@ -131,7 +134,7 @@
         input.value = '';
         msg.className = 'success';
         msg.textContent = 'Comment added successfully';
-        loadComments(todoId);
+        await loadComments(todoId);
       } catch (err) {
         msg.className = 'error';
         msg.textContent = err.message;
