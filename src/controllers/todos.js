@@ -1,23 +1,12 @@
-// Simple in-memory demo for now
-const state = {
-  items: [],
-  nextId: 1,
-};
+const { listTodos: getTodos, createTodo: addTodo } = require('../services/todos');
 
 function listTodos(req, res) {
-  res.json({ items: state.items });
+  res.json({ items: getTodos() });
 }
 
 function createTodo(req, res) {
   const { title } = req.body;
-  const now = new Date().toISOString();
-  const item = {
-    id: state.nextId++,
-    title,
-    createdAt: now,
-    updatedAt: now,
-  };
-  state.items.push(item);
+  const item = addTodo({ title });
   res.status(201).json({ item });
 }
 

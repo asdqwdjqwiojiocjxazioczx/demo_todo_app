@@ -9,4 +9,8 @@ const registerSchema = z.object({
   password: z.string().min(6).max(128),
 });
 
-module.exports = { createTodoSchema, registerSchema };
+const commentSchema = z.object({
+  content: z.string().min(1).max(1000),
+});
+
+module.exports = { createTodoSchema, registerSchema, commentSchema };
