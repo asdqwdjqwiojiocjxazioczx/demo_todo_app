@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandlers');
 
 const todoRouter = require('./routes/todos');
+const authRouter = require('./routes/auth');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/todos', todoRouter);
+app.use('/api/auth', authRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
