@@ -31,6 +31,7 @@
       <h2>Create Todo</h2>
       <div class="row">
         <input id="todoTitle" placeholder="Enter todo title" />
+        <input id="todoDueDate" type="datetime-local" />
         <button id="createTodoBtn">Create Todo</button>
       </div>
       <div id="todoMessage"></div>
@@ -75,6 +76,7 @@
           <div class="card">
             <div class="todo-title">${todo.title}</div>
             <div class="muted">Todo #${todo.id}</div>
+            <div class="muted">${todo.dueDate ? `Due: ${new Date(todo.dueDate).toLocaleString()}` : "No due date"}</div>
             <div class="comment-box">
               <h3>Comments</h3>
               <ul id="comments-${todo.id}"><li>Loading comments...</li></ul>
@@ -101,6 +103,7 @@
 
     async function createTodo() {
       const input = document.getElementById('todoTitle');
+      const dueDateInput = document.getElementById('todoDueDate');
       const msg = document.getElementById('todoMessage');
       msg.className = '';
       msg.textContent = '';
@@ -108,9 +111,10 @@
         await fetchJson('/api/todos', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: input.value })
+          body: JSON.stringify({ title: input.value, dueDate: dueDateInput.value ? new Date(dueDateInput.value).toISOString() : undefined })
         });
         input.value = '';
+        dueDateInput.value = '';
         msg.className = 'success';
         msg.textContent = 'Todo created successfully';
         await loadTodos();

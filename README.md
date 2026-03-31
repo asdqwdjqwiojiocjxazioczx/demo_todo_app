@@ -16,7 +16,7 @@ Node.js + Express starter (latest stable/LTS) with:
 ## Endpoints
 - GET /health
 - GET /api/todos
-- POST /api/todos {"title":"..."}
+- POST /api/todos {"title":"...","dueDate":"2026-04-05T10:00:00.000Z"}
 - GET /api/todos/:todoId/comments
 - POST /api/todos/:todoId/comments {"content":"..."}
 - PUT /api/todos/:todoId/comments/:commentId {"content":"..."}

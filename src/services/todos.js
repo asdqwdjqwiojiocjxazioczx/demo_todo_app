@@ -11,11 +11,12 @@ function getTodoById(id) {
   return state.items.find((item) => item.id === id);
 }
 
-function createTodo({ title }) {
+function createTodo({ title, dueDate }) {
   const now = new Date().toISOString();
   const item = {
     id: state.nextId++,
     title,
+    dueDate: dueDate || null,
     createdAt: now,
     updatedAt: now,
   };

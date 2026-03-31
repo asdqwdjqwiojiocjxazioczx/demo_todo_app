@@ -5,8 +5,8 @@ function listTodos(req, res) {
 }
 
 function createTodo(req, res) {
-  const { title } = req.body;
-  const item = addTodo({ title });
+  const { title, dueDate } = req.body;
+  const item = addTodo({ title, dueDate });
   res.status(201).json({ item });
 }
 
